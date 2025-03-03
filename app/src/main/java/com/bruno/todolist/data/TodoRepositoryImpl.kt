@@ -1,10 +1,13 @@
 package com.bruno.todolist.data
 
+import com.bruno.todolist.data.database.TodoDao
+import com.bruno.todolist.data.database.TodoEntity
 import com.bruno.todolist.domain.Todo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class TodoRepositoryImpl(
+class TodoRepositoryImpl @Inject constructor(
     private val dao: TodoDao
 ) : TodoRepository {
     override suspend fun insert(title: String, description: String?, id: Long?) {

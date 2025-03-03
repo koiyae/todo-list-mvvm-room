@@ -1,4 +1,4 @@
-package com.bruno.todolist.data
+package com.bruno.todolist.data.database
 
 import androidx.room.Dao
 import androidx.room.Delete

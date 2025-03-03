@@ -31,10 +31,8 @@ fun TodoNavHost() {
             )
         }
 
-        composable<AddEditRoute> { backStackEntry ->
-            val addEditRoute = backStackEntry.toRoute<AddEditRoute>()
+        composable<AddEditRoute> {
             AddEditScreen(
-                id = addEditRoute.id,
                 navigateBack = {
                     navController.popBackStack()
                 }

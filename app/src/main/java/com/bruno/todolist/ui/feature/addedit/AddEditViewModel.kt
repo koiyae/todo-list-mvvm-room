@@ -3,18 +3,26 @@ package com.bruno.todolist.ui.feature.addedit
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.bruno.todolist.data.TodoRepository
+import com.bruno.todolist.navigation.AddEditRoute
 import com.bruno.todolist.ui.UiEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AddEditViewModel(
-    private val id: Long? = null,
+@HiltViewModel
+class AddEditViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val repository: TodoRepository,
 ) : ViewModel() {
+
+    private val addEditRoute = savedStateHandle.toRoute<AddEditRoute>()
 
     var title by mutableStateOf("")
         private set
@@ -27,7 +35,7 @@ class AddEditViewModel(
 
 
     init {
-        id?.let {
+        addEditRoute.id?.let {
             viewModelScope.launch {
                 val todo = repository.getBy(it)
                 title = todo?.title ?: ""
@@ -56,7 +64,7 @@ class AddEditViewModel(
                 _uiEvent.send(UiEvent.ShowSnackBar("Title cannot be empty"))
                 return@launch
             }
-            repository.insert(title, description, id)
+            repository.insert(title, description, addEditRoute.id)
             _uiEvent.send(UiEvent.NavigateBack)
         }
     }

@@ -15,12 +15,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.bruno.todolist.data.TodoDatabaseProvider
-import com.bruno.todolist.data.TodoRepositoryImpl
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.bruno.todolist.domain.Todo
 import com.bruno.todolist.domain.todo1
 import com.bruno.todolist.domain.todo2
@@ -32,17 +29,9 @@ import com.bruno.todolist.ui.theme.TodoListTheme
 
 @Composable
 fun ListScreen(
+    viewModel: ListViewModel = hiltViewModel(),
     navigateToAddEditScreen: (id: Long?) -> Unit,
 ) {
-    val context = LocalContext.current.applicationContext
-    val database = TodoDatabaseProvider.provide(context)
-    val repository = TodoRepositoryImpl(
-        dao = database.todoDao
-    )
-    val viewModel = viewModel<ListViewModel> {
-        ListViewModel(repository = repository)
-    }
-
     val todos by viewModel.todos.collectAsState()
 
     LaunchedEffect(Unit) {

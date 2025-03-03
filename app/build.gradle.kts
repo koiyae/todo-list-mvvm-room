@@ -1,23 +1,27 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.hilt.android)
     kotlin("plugin.serialization") version libs.versions.kotlin
 }
 
 android {
-    namespace = "com.bruno.todolist"
-    compileSdk = 35
+    namespace = "com.example.todolist"
+    compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.bruno.todolist"
-        minSdk = 24
+        applicationId = "com.example.todolist"
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -39,14 +43,17 @@ android {
     buildFeatures {
         compose = true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
-    //navigation
-    implementation(libs.androidx.navigation.compose)
-
-    // kotlinx serialization
-    implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -56,10 +63,22 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.room.common)
-    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.hilt.navigation.fragment)
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+    // Room
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+
+    // Navigation
+    implementation(libs.androidx.navigation.compose)
+    // Dagger Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+
+    // Kotlinx Serialization
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
 
@@ -67,7 +86,15 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+hilt {
+    enableAggregatingTask = false
 }
