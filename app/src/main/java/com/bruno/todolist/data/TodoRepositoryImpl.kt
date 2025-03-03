@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class TodoRepositoryImpl @Inject constructor(
-    private val dao: TodoDao
+    private val localDataSource: LocalDataSource
 ) : TodoRepository {
     override suspend fun insert(title: String, description: String?, id: Long?) {
         val entity = id?.let {
-            dao.getBy(id)?.copy(
+            localDataSource.getBy(id)?.copy(
                 title = title,
                 description = description
             )
@@ -21,22 +21,22 @@ class TodoRepositoryImpl @Inject constructor(
             description = description,
             isCompleted = false,
         )
-        dao.insert(entity)
+        localDataSource.insertOrUpdate(entity)
     }
 
     override suspend fun updateCompleted(id: Long, isCompleted: Boolean) {
-        val existingEntity = dao.getBy(id) ?: return
+        val existingEntity = localDataSource.getBy(id) ?: return
         val updatedEntity = existingEntity.copy(isCompleted = isCompleted)
-        dao.insert(updatedEntity)
+        localDataSource.insertOrUpdate(updatedEntity)
     }
 
     override suspend fun delete(id: Long) {
-        val existingEntity = dao.getBy(id) ?: return
-        dao.delete(existingEntity)
+        val existingEntity = localDataSource.getBy(id) ?: return
+        localDataSource.delete(existingEntity)
     }
 
     override fun getAll(): Flow<List<Todo>> {
-        return dao.getAll().map { entities ->
+        return localDataSource.getAll().map { entities ->
             entities.map { entity ->
                 Todo(
                     id = entity.id,
@@ -49,7 +49,7 @@ class TodoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getBy(id: Long): Todo? {
-        return dao.getBy(id)?.let { entity ->
+        return localDataSource.getBy(id)?.let { entity ->
             Todo(
                 id = entity.id,
                 title = entity.title,
